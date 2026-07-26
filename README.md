@@ -114,6 +114,7 @@ make watch DOC=src/2026-dsx
 | 名前 | エンジン | 内容 |
 |---|---|---|
 | `minimal` | upLaTeX → dvipdfmx | `jsarticle` のみ。独自 `.sty` に依存しない汎用テンプレート |
+| `fundsx` | upLaTeX → dvipdfmx | データサイエンス演習 最終レポートの配布テンプレート（`ujarticle` + `fundsx.sty`）|
 
 ## PDF の自動ビルドと配布
 
