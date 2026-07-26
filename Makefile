@@ -1,5 +1,5 @@
 DATE := $(shell date +%Y%m%d)
-DOC ?= src/report
+DOC ?= src/2026-dsx-bravo-report
 RUN := docker compose run --rm -w /workdir/$(DOC) latex
 ARCHIVE := $(notdir $(DOC))_$(DATE).zip
 
