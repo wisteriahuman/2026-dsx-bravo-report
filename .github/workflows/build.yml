@@ -1,0 +1,94 @@
+name: Build PDFs
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:TL2025-historic
+    # src/ が空（テンプレートリポジトリ本体の状態）なら Pages 関連を丸ごと飛ばす
+    outputs:
+      has_docs: ${{ steps.collect.outputs.has_docs }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # コンテナジョブのデフォルトシェルは sh (dash) なので POSIX 構文のみ使う
+      - name: Build every document under src/
+        run: |
+          set -e
+          for d in src/*/; do
+            [ -f "$d/main.tex" ] || continue
+            echo "::group::build $d"
+            (cd "$d" && latexmk main.tex)
+            echo "::endgroup::"
+          done
+
+      - name: Collect PDFs
+        id: collect
+        run: |
+          set -e
+          mkdir -p _site
+          for d in src/*/; do
+            name=$(basename "$d")
+            [ -f "$d/main.pdf" ] || continue
+            mkdir -p "_site/$name"
+            cp "$d/main.pdf" "_site/$name/main.pdf"
+          done
+          if [ -n "$(ls -A _site)" ]; then
+            echo "has_docs=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_docs=false" >> "$GITHUB_OUTPUT"
+            echo "src/ に文書がないので Pages の公開はスキップします"
+          fi
+
+      - name: Upload PDF artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdfs
+          path: _site
+          if-no-files-found: warn
+
+      - name: Prepare Pages site
+        if: github.ref == 'refs/heads/main' && steps.collect.outputs.has_docs == 'true'
+        run: |
+          set -e
+          : > docs.html
+          for d in src/*/; do
+            name=$(basename "$d")
+            [ -f "_site/$name/main.pdf" ] || continue
+            printf '      <li><a href="%s/main.pdf">%s</a></li>\n' "$name" "$name" >> docs.html
+          done
+          [ -s docs.html ] || printf '      <li class="empty">まだ文書がありません</li>\n' > docs.html
+          SHORT_SHA=$(printf '%.7s' "$GITHUB_SHA")
+          BUILD_DATE=$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST')
+          REPO_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
+          # URL に / が含まれるので、この置換だけ区切り文字を | にする
+          sed -e "s/{{COMMIT}}/$SHORT_SHA/" \
+              -e "s/{{DATE}}/$BUILD_DATE/" \
+              -e "s|{{REPO_URL}}|$REPO_URL|" \
+              -e "/{{DOCS}}/r docs.html" \
+              -e "/{{DOCS}}/d" \
+              site/index.html > _site/index.html
+          rm docs.html
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main' && steps.collect.outputs.has_docs == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.has_docs == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

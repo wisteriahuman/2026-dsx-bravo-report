@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LaTeX 文書一覧</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --fg: #1c1e21;
+      --muted: #6b7280;
+      --card: #ffffff;
+      --accent: #2563eb;
+      --border: #e5e7eb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #16181d;
+        --fg: #e5e7eb;
+        --muted: #9ca3af;
+        --card: #1f2329;
+        --accent: #60a5fa;
+        --border: #33383f;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      min-height: 100dvh;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .meta code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    a.repo {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-decoration: none;
+    }
+
+    a.repo:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      padding: 1.25rem;
+      max-width: 46rem;
+      margin: 0 auto;
+    }
+
+    ul.docs {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    ul.docs a {
+      display: block;
+      padding: 0.9rem 1.1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    ul.docs a:hover {
+      border-color: var(--accent);
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>LaTeX 文書一覧</h1>
+    <span class="meta">更新: {{DATE}} / <code>{{COMMIT}}</code></span>
+    <span class="spacer"></span>
+    <a class="repo" href="{{REPO_URL}}">GitHub</a>
+  </header>
+  <main>
+    <ul class="docs">
+{{DOCS}}
+    </ul>
+  </main>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+*.aux
+*.log
+*.dvi
+*.toc
+*.lof
+*.lot
+*.out
+*.bbl
+*.blg
+*.idx
+*.ilg
+*.ind
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.xbb
+
+# 生成PDF。ただしテンプレ同梱の見本PDFは残す
+*.pdf
+!templates/**/*.pdf
+
+# 提出用アーカイブ
+*.zip
+
+# OS・エディタ
+.DS_Store
+
+# Core dump
+core
+core.*
+*.core

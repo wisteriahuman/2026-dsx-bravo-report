@@ -1,0 +1,9 @@
+services:
+  latex:
+    # Tex Live 2025 の凍結スナップショット
+    image: texlive/texlive:TL2025-historic
+    working_dir: /workdir
+    volumes:
+      - .:/workdir
+    environment:
+      TZ: Asia/Tokyo
