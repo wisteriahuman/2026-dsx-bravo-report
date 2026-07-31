@@ -30,10 +30,10 @@
 \section{関連研究}
 
 \subsection{心理的モメンタムの存在とその主観的評価}
-サッカーにおける「試合の流れ」は、スポーツ心理学の分野において「心理的モメンタム（Psychological Momentum）」という概念で研究されてきた。これまでの先行研究では、選手が得点や失点といった重大な試合中のイベントによって、この心理的モメンタムの急激な変化を感じ取ることが報告されている。例えば、Redwood-Brown et al. (2018) は、エリートサッカー選手を対象とした調査を通じて、失点が選手にネガティブな心理的変化を引き起こす最も主要な要因であることを明らかにした。同研究によれば、特に自チームが失点した直後には、チーム全体の勢いや連動性が失われたと選手自身が強く認識していることが示されている。しかし、これらの先行研究は主に選手に対するインタビューやアンケートに基づく「主観的な心理状態の評価」にとどまる傾向があった。これに対し本研究は、選手が主観的に感じる「流れ」や「モメンタム」の変化を直接測定するのではなく、実際のピッチ上で記録されたパス、ボール保持、ポジション、守備アクション、プレー量など、多岐にわたる31項目の客観的なプレーデータを用いて、失点前後の状態を判別できるかという問題として定式化した点に大きな特徴がある。すなわち、先行研究で示された選手の主観的な心理変化が、実際の客観的なプレーデータ（選手の行動変容）として明確に表れるかを統計的に検証した点が、本研究の重要な新規性である。
+サッカーにおける「試合の流れ」は、スポーツ心理学の分野において「心理的モメンタム（Psychological Momentum）」という概念で研究されてきた。これまでの先行研究では、選手が得点や失点といった重大な試合中のイベントによって、この心理的モメンタムの急激な変化を感じ取ることが報告されている。例えば、Redwood-Brown et al. (2018)\cite{ref:redwood} は、エリートサッカー選手を対象とした調査を通じて、失点が選手にネガティブな心理的変化を引き起こす最も主要な要因であることを明らかにした。同研究によれば、特に自チームが失点した直後には、チーム全体の勢いや連動性が失われたと選手自身が強く認識していることが示されている。しかし、これらの先行研究は主に選手に対するインタビューやアンケートに基づく「主観的な心理状態の評価」にとどまる傾向があった。これに対し本研究は、選手が主観的に感じる「流れ」や「モメンタム」の変化を直接測定するのではなく、実際のピッチ上で記録されたパス、ボール保持、ポジション、守備アクション、プレー量など、多岐にわたる32項目の客観的なプレーデータを用いて、失点前後の状態を判別できるかという問題として定式化した点に大きな特徴がある。すなわち、先行研究で示された選手の主観的な心理変化が、実際の客観的なプレーデータ（選手の行動変容）として明確に表れるかを統計的に検証した点が、本研究の重要な新規性である。
 
 \subsection{得点時間帯がモメンタムに与える影響}
-また、失点によるモメンタムの変化を測定する上では、その事象が発生した「文脈」を厳密に考慮する必要がある。Den Hartigh et al. (2019) の研究においては、ゴールが発生した時間帯によって、その後の心理的モメンタムへ与える影響が大きく異なることが実証されている。試合序盤の失点と、タイムアップ直前の終盤における失点とでは、選手の心理的ダメージの深刻さや、その後に取るべき戦術的振る舞いに明確な違いが生じるためである。本研究ではこの先行研究の知見を重く受け止め、データマイニング手法における重要な条件統制の根拠として採用した。具体的には、失点による純粋な影響のみを抽出するため、比較対象となる「決定機を防いだ場面（セーブ場面）」を抽出するにあたり、単に前後半や点差が同じであるという条件を揃えるだけでなく、「事象の発生時刻差が8分以内であること」という極めて厳密なマッチング条件を設けた。このように試合状況の背景要因を可能な限り厳密に統制することで、事象が発生した時間帯の違いによるデータへのノイズを排除し、失点というイベントそのものがもたらす効果を正確に検証するための工夫を施している。
+また、失点によるモメンタムの変化を測定する上では、その事象が発生した「文脈」を厳密に考慮する必要がある。Den Hartigh et al. (2020)\cite{ref:hartigh} の研究においては、ゴールが発生した時間帯によって、その後の心理的モメンタムへ与える影響が大きく異なることが実証されている。試合序盤の失点と、タイムアップ直前の終盤における失点とでは、選手の心理的ダメージの深刻さや、その後に取るべき戦術的振る舞いに明確な違いが生じるためである。本研究ではこの先行研究の知見を重く受け止め、データマイニング手法における重要な条件統制の根拠として採用した。具体的には、失点による純粋な影響のみを抽出するため、比較対象となる「決定機を防いだ場面（セーブ場面）」を抽出するにあたり、単に前後半や点差が同じであるという条件を揃えるだけでなく、「事象の発生時刻差が8分以内であること」という極めて厳密なマッチング条件を設けた。このように試合状況の背景要因を可能な限り厳密に統制することで、事象が発生した時間帯の違いによるデータへのノイズを排除し、失点というイベントそのものがもたらす効果を正確に検証するための工夫を施している。
 
 \subsection{本研究の立ち位置}
 以上のように、これまでの先行研究は失点による心理的モメンタムの変化が存在することを主観的評価の観点から明確に示しているものの、それが実際の試合中のプレーパフォーマンスやチームのスタッツにどのような形で波及するのかという点においては、依然として検証の余地が残されていた。本研究は、Redwood-BrownらやDen Hartighらが示した心理的パラダイムと変数の影響を出発点としつつ、厳密にマッチングされた大規模なイベントデータを用いることで、主観的な「流れの変化」が客観的なプレーデータに現れるかという問いに対し、新たな学術的裏付けを提供するものである。
@@ -46,7 +46,7 @@
 % fundsx.sty の脚注定義と url パッケージの相性が悪く，\footnote{\url{...}} はビルドが通らない．
 % テンプレートの指示どおり，URLは本文中に置く．
 本研究では，StatsBomb社が無償で公開しているイベントデータ
-（StatsBomb Open Data，\url{https://github.com/statsbomb/open-data}）を用いた．
+（StatsBomb Open Data\cite{ref:statsbomb}，\url{https://github.com/hudl/open-data}）を用いた．
 このデータは同社のアナリストが試合映像を見ながら手作業で記録したもので，
 研究・教育目的での利用が認められている．
 対象としたのは，このうちスペイン1部リーグ（ラ・リーガ）2015-16シーズンの全380試合である．
@@ -241,7 +241,8 @@ AUCは1.0であれば完全に見分けられ，0.5であればまったく見�
 
 失点の後は必ずセンターサークルからのキックオフで試合が再開されるため，
 失点側の「後の3分」にだけ，キックオフ直後の定型的なプレーが入り込む．
-中間発表後の検証で明らかになったとおり，この再開の構造は失点の有無とは無関係に判別を押し上げてしまう．
+これは失点の影響ではなく再開の形式による差であり，
+そのままでは失点そのものの効果と区別がつかない．
 そこで本研究では，処置群と対照群のどちらについても，
 対象チームがその場面の後に最初に行った一続きの攻撃（ポゼッション）が終わった時点を起点とし，
 そこから先の実プレー3分間を「後区間」とした（図\ref{fig:design}A）．
@@ -338,11 +339,13 @@ $p$値は，同じ単位で処置と対照のラベルを入れ替える並べ�
 
 解析はすべてローカルのノートPC（Apple M5，メモリ32\,GB，macOS 26.5）上で行い，
 クラウド環境は使用していない．
-実装にはPython 3.12.13を用い，データの整形にpandas 3.0.3とNumPy 2.4.6，
-統計処理にSciPy 1.18.0，モデルの学習と評価にscikit-learn 1.9.0，
-作図にmatplotlib 3.11.0を使用した．
-パッケージの管理にはuvを用い，同じ環境を再現できるようにした．
-StatsBombの公開イベントデータはstatsbombpy経由でJSONとして取得し，
+実装にはPython 3.12.13を用い，
+データの整形にpandas 3.0.3\cite{ref:pandas}とNumPy 2.4.6\cite{ref:numpy}，
+統計処理にSciPy 1.18.0\cite{ref:scipy}，
+モデルの学習と評価にscikit-learn 1.9.0\cite{ref:sklearn}，
+作図にmatplotlib 3.11.0\cite{ref:matplotlib}を使用した．
+パッケージの管理にはuv\cite{ref:uv}を用い，同じ環境を再現できるようにした．
+StatsBombの公開イベントデータ\cite{ref:statsbomb}はstatsbombpy\cite{ref:statsbombpy}経由でJSONとして取得し，
 リポジトリに保存したうえで解析に用いた．
 
 \subsection{データの規模}
@@ -375,10 +378,6 @@ StatsBombの公開イベントデータはstatsbombpy経由でJSONとして取�
 計算時間の大半は，380試合分のイベントJSONから実プレー区間と32項目を復元する前処理が占めており，
 最終的な解析（3種類のシード×2種類の対応づけ）の一連の実行にかかった時間は
 前述の環境で1分12秒であった．
-
-% 参考文献（第10章担当）へ：本節で挙げた scikit-learn / pandas / NumPy / SciPy /
-% matplotlib / uv / statsbombpy を引用できるようにしてもらえると助かります．
-% 引用を入れる場合は上の各ライブラリ名の直後に \cite{...} を追加してください．
 
 \subsection{作業の分担}
 
@@ -519,11 +518,18 @@ xGをそろえない対応づけでも0.652〜0.663と，同じ水準の値が�
 
 
 % 参考⽂献
+% 本文で引用した順に並べている．書誌情報はCrossRef（DOI）で確認した．
 \begin{thebibliography}{99}
-% ＜
- \bibitem{ref:1} 著者名，文献のタイトル，文献の出典名（論文誌，国際会議，学会名），（必要に応じ）Vol.をつけて巻，No.をつけて号，pp.をつけて始めのページ-終わりのページ，西暦年．
- \bibitem{ref:2} 著者名，文献のタイトル，文献の出典名（論文誌，国際会議，学会名），（必要に応じ）Vol.をつけて巻，No.をつけて号，pp.をつけて始めのページ-終わりのページ，西暦年．
-% ＞
+ \bibitem{ref:redwood} Redwood-Brown, A. J., Sunderland, C. A., Minniti, A. M., O'Donoghue, P. G., Perceptions of psychological momentum of elite soccer players, International Journal of Sport and Exercise Psychology, Vol.16, No.6, pp.590-606, 2018.
+ \bibitem{ref:hartigh} Den Hartigh, R. J. R., Van Yperen, N. W., Gernigon, C., Psychological momentum in football: the impact of a last-minute equalizer in a knock-out match, Science and Medicine in Football, Vol.4, No.3, pp.178-181, 2020.
+ \bibitem{ref:statsbomb} Hudl StatsBomb, StatsBomb Open Data, \url{https://github.com/hudl/open-data}（2026年7月31日参照）.
+ \bibitem{ref:pandas} McKinney, W., Data Structures for Statistical Computing in Python, Proceedings of the 9th Python in Science Conference, pp.56-61, 2010.
+ \bibitem{ref:numpy} Harris, C. R., Millman, K. J., van der Walt, S. J. ほか, Array programming with NumPy, Nature, Vol.585, No.7825, pp.357-362, 2020.
+ \bibitem{ref:scipy} Virtanen, P., Gommers, R., Oliphant, T. E. ほか, SciPy 1.0: fundamental algorithms for scientific computing in Python, Nature Methods, Vol.17, No.3, pp.261-272, 2020.
+ \bibitem{ref:sklearn} Pedregosa, F., Varoquaux, G., Gramfort, A. ほか, Scikit-learn: Machine Learning in Python, Journal of Machine Learning Research, Vol.12, pp.2825-2830, 2011.
+ \bibitem{ref:matplotlib} Hunter, J. D., Matplotlib: A 2D Graphics Environment, Computing in Science \& Engineering, Vol.9, No.3, pp.90-95, 2007.
+ \bibitem{ref:uv} Astral, uv: An extremely fast Python package and project manager, \url{https://github.com/astral-sh/uv}（2026年7月31日参照）.
+ \bibitem{ref:statsbombpy} Hudl StatsBomb, statsbombpy, \url{https://github.com/hudl/statsbombpy}（2026年7月31日参照）.
 \end{thebibliography}
 
 \clearpage
