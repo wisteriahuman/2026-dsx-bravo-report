@@ -1,26 +1,172 @@
 \section*{実験に⽤いたソースコード}
 
+解析に用いたスクリプトのうち，本研究の手法を特徴づける部分を抜粋する．
+全体は \url{https://github.com/KurenNagata/bravo} に置いてある．
+
+\subsection*{A. 実プレー時間の復元（\texttt{extract\_dataset.py}）}
+
+イベントに記録された継続時間をつなぎ，10秒を超える空白を停止とみなして時計から除く．
+これにより，前後の「3分」を停止時間の混入なくそろえられる．
+
 \begin{verbatim}
-※等幅フォント（Consolusなど）推奨
+MAX_LIVE_GAP_SEC = 10.0
 
-＜
-ファイル：FizzBuzz.c
+def live_segments(events, period):
+    """possession 内のイベント列から実プレー区間を復元する。"""
+    by_possession = defaultdict(list)
+    for e in events:
+        if e["period"] != period or "possession" not in e:
+            continue
+        if e["type"]["name"] in NON_PLAY_TYPES:
+            continue
+        s = float(tsec(e))
+        duration = max(0.0, float(e.get("duration", 0.0) or 0.0))
+        by_possession[e["possession"]].append((s, s + duration))
 
-#include <stdio.h>
-int main(void){
-    int i;
-    for(i=1;i<=30;i++){
-        if(i%15==0){
-            printf("FizzBuzz¥n");
-        }else if(i%5==0){
-            printf("Buzz¥n");
-        }else if(i%3==0){
-            printf("Fizz¥n");
-        }else{
-            printf("%d¥n",i);
-        }
+    pieces = []
+    for intervals in by_possession.values():
+        intervals.sort()
+        cur_s, cur_t = intervals[0]
+        for s, t in intervals[1:]:
+            if s - cur_t > MAX_LIVE_GAP_SEC:   # 10秒超の空白は停止
+                if cur_t > cur_s:
+                    pieces.append((cur_s, cur_t))
+                cur_s, cur_t = s, t
+            else:
+                cur_t = max(cur_t, t)
+        if cur_t > cur_s:
+            pieces.append((cur_s, cur_t))
+
+    pieces.sort()
+    merged = []
+    for s, t in pieces:
+        if not merged or s > merged[-1][1]:
+            merged.append((s, t))
+        else:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], t))
+    return merged
+\end{verbatim}
+
+\subsection*{B. 32項目の組み立て（\texttt{train\_models.py}）}
+
+イベントの記録から機械的に列挙した項目を，内容・位置，実プレー1分あたりの回数，
+テンポの3種類に分けてまとめる．指標を人が選び直さないための処理である．
+
+\begin{verbatim}
+def feature_sets(all_cols):
+    per_active_min = [c for c in all_cols
+                      if c.endswith("_per_active_min")]
+    raw_counts = [c for c in all_cols
+                  if (c.startswith("n_") or c == "xg_sum")
+                  and not c.endswith("_per_active_min")]
+    tempo = [
+        "events_per_possession",
+        "passes_per_possession",
+        "within_possession_gap_mean",
+    ]
+    content = [c for c in all_cols
+               if c not in per_active_min
+               and c not in raw_counts
+               and c not in tempo]
+    return {
+        "flow_full": content + per_active_min + tempo,  # 32項目
+        "content_only": content,
     }
-    return 0;
-}
-＞    
+\end{verbatim}
+
+\subsection*{C. fold先行の対応づけ（\texttt{did\_foldfirst.py}）}
+
+試合を先に5つの組へ分け，対応づけを同じ組の中だけで行う．
+これにより，同じ試合・同じ対が学習と評価にまたがらないことを設計だけで保証する．
+
+\begin{verbatim}
+def match_within_blocks(treated, controls, block_of, use_xg):
+    used, pairs = set(), []
+    order = sorted(range(len(treated)),
+                   key=lambda i: treated[i]["clock"])
+    for i in order:
+        t = treated[i]
+        if use_xg and t.get("xg") is None:
+            continue
+        tb = block_of[str(t["match_id"])]
+        best_j, best_cost = None, None
+        for j, c in enumerate(controls):
+            if j in used or block_of[str(c["match_id"])] != tb:
+                continue                    # 同じ組の中だけで探す
+            if c["period"] != t["period"]:
+                continue                    # 前後半を一致
+            if c["state"] != t["state"]:
+                continue                    # 点差状態を一致
+            if c["is_home"] != t["is_home"]:
+                continue                    # ホーム／アウェーを一致
+            if c["match_id"] == t["match_id"]:
+                continue
+            gap = abs(c["clock"] - t["clock"])
+            if gap > MATCH_MINUTE_TOL:       # 時刻差 8 分以内
+                continue
+            cost = gap / MATCH_MINUTE_TOL
+            if use_xg:
+                if c.get("xg") is None:
+                    continue
+                dxg = abs(c["xg"] - t["xg"])
+                if dxg > XG_TOL:             # xG 差 0.10 以内
+                    continue
+                cost += dxg / XG_TOL
+            if best_cost is None or cost < best_cost:
+                best_j, best_cost = j, cost
+        if best_j is not None:
+            used.add(best_j)
+            pairs.append((t, controls[best_j]))
+    return pairs
+\end{verbatim}
+
+\subsection*{D. 差の差の学習・評価（\texttt{did\_foldfirst.py}，\texttt{train\_models.py}）}
+
+後区間と前区間の差を入力とし，組をそのままfoldとして交差検証する．
+AUCは対になった処置側・対照側の判定値の大小から求め，
+95\%信頼区間は連結成分を単位とするブートストラップで与える．
+
+\begin{verbatim}
+# 判別器（train_models.py）
+Pipeline([
+    ("impute", SimpleImputer(strategy="median")),
+    ("scale", StandardScaler()),
+    ("clf", LogisticRegression(max_iter=2000, C=1.0,
+                               random_state=SEED)),
+])
+
+# 学習・評価（did_foldfirst.py の evaluate_blocks より抜粋）
+rows = []
+for t, c in pairs:
+    block = block_of[str(t["match_id"])]
+    for label, u in ((1, t), (0, c)):
+        delta = {f: (u["after"][f] - u["before"][f])   # 後 - 前
+                 for f in cols}
+        rows.append({"block": block, "pair": t["key"],
+                     "label": label, **delta})
+df = pd.DataFrame(rows)
+
+probs = np.empty(len(df))
+for b in range(N_BLOCKS):              # 組をそのまま fold にする
+    te = df["block"] == b
+    model = build_models()[PRIMARY_MODEL].fit(
+        df.loc[~te, cols].to_numpy(dtype=float),
+        df.loc[~te, "label"].to_numpy())
+    probs[te.to_numpy()] = model.predict_proba(
+        df.loc[te, cols].to_numpy(dtype=float))[:, 1]
+
+piv = df.assign(prob=probs).pivot_table(
+    index="pair", columns="label", values="prob").dropna()
+values = piv[[0, 1]].to_numpy()
+observed = roc_auc_score(np.tile([0, 1], len(values)),
+                         values.reshape(-1))
+
+# 連結成分を単位としたブートストラップ 5,000 回
+rng = np.random.default_rng(SEED)
+boots = np.empty(N_BOOT)
+for b in range(N_BOOT):
+    pick = rng.choice(keys, size=len(keys), replace=True)
+    idx = [i for cmp_ in pick for i in by_comp[cmp_]]
+    boots[b] = auc_of(values[idx])
+ci95 = np.quantile(boots, [0.025, 0.975])
 \end{verbatim}
